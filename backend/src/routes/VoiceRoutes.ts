@@ -1,13 +1,15 @@
 import express from "express";
-import { uploadVoiceFile, getAllVoiceFiles } from "../controllers/VoiceController.js";
-import { verifyToken } from "../utils/Token.js";  // 필요한 경우 인증 미들웨어 추가
+import multer from "multer";
+import { convertSpeechToText } from "../controllers/STTController.js";
+import { convertTextToSpeech } from "../controllers/TTSController.js";
 
 const voiceRoutes = express.Router();
+const upload = multer(); // 메모리 내 업로드 사용
 
-// 음성 파일 업로드 라우트 (파일 업로드를 위해 verifyToken 미들웨어 추가 가능)
-voiceRoutes.post("/chat/c/:conversationId/voice", verifyToken, uploadVoiceFile);
+// STT 라우트
+voiceRoutes.post("/stt", upload.single("audio"), convertSpeechToText);
 
-// 모든 음성 파일 목록을 가져오는 라우트
-voiceRoutes.get("/files", verifyToken, getAllVoiceFiles);
+// TTS 라우트
+voiceRoutes.post("/tts", convertTextToSpeech);
 
 export default voiceRoutes;
